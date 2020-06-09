@@ -1,0 +1,29 @@
+vendor/
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Laravel 4 specific
+bootstrap/compiled.php
+app/storage/
+
+# Laravel 5 & Lumen specific
+/public/hot
+/public/storage
+/storage/*.key
+.env.*.php
+.env.php
+.env
+.env.testing
+.env.backup
+.env.example
+.env.prod
+.phpunit.result.cache
+
+# Custom
+/*.sh
+*.swp
+*.bp
+*.backup
+*.zip
+*.7z
