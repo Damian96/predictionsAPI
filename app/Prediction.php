@@ -3,12 +3,15 @@
 namespace App;
 
 use App\Casts\PredictionCast;
+use App\Casts\StatusCast;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int id
  * @property int prediction
  * @property string market_type
+ * @property int status
+ * @method static whereId(int $id)
  */
 class Prediction extends Model
 {
@@ -23,6 +26,22 @@ class Prediction extends Model
      * @var array
      */
     protected $guarded = ['id'];
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'id' => 'int',
+        'event_id' => 'int',
+        'prediction' => PredictionCast::class,
+        'status' => StatusCast::class,
+//        'market_type' => MarketType::class,
+        'market_type' => 'string',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 
     /**
      * The model's default values for attributes.
@@ -42,7 +61,7 @@ class Prediction extends Model
      * @var array
      */
     protected $fillable = [
-        'event_id', 'market_score', 'prediction', 'status'
+        'event_id', 'market_type', 'prediction', 'status'
     ];
 
     /**
@@ -55,19 +74,16 @@ class Prediction extends Model
     ];
 
     /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
+     * @param string $key
+     * @return mixed
      */
-    protected $casts = [
-        'id' => 'int',
-        'event_id' => 'int',
-        'prediction' => PredictionCast::class,
-//        'market_type' => MarketType::class,
-        'market_type' => 'string',
-        'status' => 'boolean',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
-
+    public function __get($key)
+    {
+        switch ($key) {
+            case 'prediction':
+                return $this->getAttribute('prediction')->toString();
+            default:
+                return parent::__get($key);
+        }
+    }
 }

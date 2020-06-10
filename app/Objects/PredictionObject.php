@@ -5,6 +5,7 @@ namespace App\Objects;
 
 
 use App\Casts\PredictionCast;
+use Illuminate\Contracts\Database\Eloquent\Castable;
 
 /**
  * Class PredictionObject
@@ -13,7 +14,7 @@ use App\Casts\PredictionCast;
  * @property String $score
  * @package App\Objects
  */
-class PredictionObject implements \Illuminate\Contracts\Database\Eloquent\Castable
+class PredictionObject implements Castable
 {
     private $market_type;
     private $result;
@@ -29,9 +30,7 @@ class PredictionObject implements \Illuminate\Contracts\Database\Eloquent\Castab
         $this->market_type = $market_type;
         $this->result = $result;
         if ($this->market_type === 'correct_score') {
-//            $chars = str_split($result);
             $this->score = $result;
-//            $this->result = ???
         } else {
             $this->result = $result;
         }

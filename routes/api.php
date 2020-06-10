@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +13,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::prefix('/predictions/')->group(function () {
+    Route::get('/', 'ApiController@getAll')->name('predictions.getAll');
+    Route::post('/{prediction}/status', 'ApiController@updateStatus')->name('predictions.update');
+    Route::post('/', 'ApiController@create')->name('predictions.create');
 });

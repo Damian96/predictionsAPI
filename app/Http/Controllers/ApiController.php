@@ -2,17 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\PredictionCollection;
 use App\Prediction;
+use App\Repository\Eloquent\PredictionRepository;
 use http\Exception\RuntimeException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Throwable;
 
 class ApiController extends Controller
 {
 
-    public function __construct()
+    /**
+     * @var PredictionRepository
+     */
+    private PredictionRepository $predictionService;
+
+    public function __construct(PredictionRepository $service)
     {
+        $this->predictionService = $service;
         $this->middleware('api');
     }
 
@@ -29,24 +36,42 @@ class ApiController extends Controller
                 ];
             case 'create':
                 return [
-                    'event_id' => 'required|int',
+                    'event_id' => 'required|int|min:1',
                     'market_type' => 'required|string|in:1x2,correct_score',
-                    'prediction' => 'required|regex:/((H|A|X)|\d:\d)/i',
+                    'prediction' => [
+                        'required',
+                        'string',
+                        'regex:/(H|A|X|\d:\d)/i'
+                    ]
                 ];
             default:
                 return [];
         }
     }
 
+    /**
+     * @param string $action
+     * @return array
+     */
+    public function messages($action)
+    {
+        switch ($action) {
+            // @TODO:
+            case 'create':
+                return [
+
+                ];
+            default:
+                return [];
+        }
+    }
 
     /**
      * @return \Illuminate\Http\Response
      */
     public function getAll()
     {
-        $collection = new PredictionCollection(Prediction::all());
-
-        return $this->sendResponse($collection);
+        return $this->sendResponse($this->predictionService->all());
     }
 
     /**
@@ -78,16 +103,16 @@ class ApiController extends Controller
      */
     public function create(Request $request)
     {
-        $validator = Validator::make($request->all(), $this->rules(__FUNCTION__));
+        $validator = Validator::make($request->all(), $this->rules(__FUNCTION__), $this->messages(__FUNCTION__));
 
         if (!$validator->fails()) {
             $prediction = new Prediction($request->all());
 
             try {
                 $prediction->saveOrFail();
-            } catch (\Throwable $exception) {
-                throw_if(env('APP_DEBUG', false), new RuntimeException(sprintf('Could not create Prediction'), 503));
                 return $this->sendResponse($prediction->toJson());
+            } catch (Throwable $exception) {
+                throw_if(env('APP_DEBUG', false), new RuntimeException(sprintf('Could not create Prediction'), 503));
             }
         }
 
@@ -101,6 +126,11 @@ class ApiController extends Controller
      */
     private function sendResponse($data, $code = 200)
     {
+        if (is_string($data)) {
+            return \response($data, $code, [
+                'Content-Type' => 'application/json'
+            ]);
+        }
         try {
             $json = json_encode($data);
             return \response($json, $code, [

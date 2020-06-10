@@ -14,7 +14,7 @@ class PredictionCast implements CastsAttributes
      * @param string $key
      * @param string $value
      * @param array $attributes
-     * @return PredictionObject
+     * @return string
      */
     public function get($model, $key, $value, $attributes)
     {
@@ -29,11 +29,11 @@ class PredictionCast implements CastsAttributes
             } else {
                 $result = 'X';
             }
-            return new PredictionObject($market_type, $result);
+            return (new PredictionObject($market_type, $result))->toString();
         } else {
             $market_type = 'correct_score';
             $score = $chars[0] . ':' . $chars[2];
-            return new PredictionObject($market_type, $score);
+            return (new PredictionObject($market_type, $score))->toString();
         }
     }
 
@@ -42,12 +42,12 @@ class PredictionCast implements CastsAttributes
      *
      * @param \Illuminate\Database\Eloquent\Model $model
      * @param string $key
-     * @param \App\Objects\PredictionObject $value
+     * @param string $value
      * @param array $attributes
      * @return string
      */
     public function set($model, $key, $value, $attributes)
     {
-        return $value->toString();
+        return $value;
     }
 }

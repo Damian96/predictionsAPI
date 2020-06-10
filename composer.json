@@ -38,6 +38,7 @@
         },
         "classmap": [
             "database/seeds",
+            "database/migrations",
             "database/factories"
         ]
     },
