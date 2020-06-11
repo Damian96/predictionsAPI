@@ -2,7 +2,9 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Support\Facades\Route;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -50,6 +52,13 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
+        if ($exception instanceof ModelNotFoundException && $request->acceptsJson()) {
+            $parts = parse_url($request->server('REQUEST_URI'));
+            $id = intval(explode('/', $parts['path'])[3]);
+            $request->request->add(['id' => $id]);
+            return Route::respondWithRoute('api.fallback.404');
+        }
+
         return parent::render($request, $exception);
     }
 }

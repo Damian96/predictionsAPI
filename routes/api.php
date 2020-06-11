@@ -18,3 +18,9 @@ Route::prefix('/predictions/')->group(function () {
     Route::post('/{prediction}/status', 'ApiController@updateStatus')->name('predictions.update');
     Route::post('/', 'ApiController@create')->name('predictions.create');
 });
+
+Route::group(['prefix' => '/fallback'], function () {
+    Route::get('/400', 'ApiController@error400')->name('api.fallback.400');
+    Route::get('/400', 'ApiController@error404')->name('api.fallback.404');
+});
+

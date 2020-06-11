@@ -2,6 +2,7 @@
   <dictionary name="damia">
     <words>
       <w>fillable</w>
+      <w>loremipsum</w>
     </words>
   </dictionary>
 </component>

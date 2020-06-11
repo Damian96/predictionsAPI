@@ -10,8 +10,14 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Throwable;
 
+/**
+ * Class ApiController
+ * @package App\Http\Controllers
+ */
 class ApiController extends Controller
 {
+    const BAD_REQUEST = 400;
+    const NOT_FOUND = 404;
 
     /**
      * @var PredictionRepository
@@ -109,7 +115,7 @@ class ApiController extends Controller
         }
 
         Log::error(sprintf("Client:[%s] failed to %s:%s, [%s].", __CLASS__, __FUNCTION__, $request->getClientIp(), $validator->errors()->first('status')));
-        return $this->sendResponse(['error' => $validator->errors()->first('status')], 503);
+        return $this->sendResponse(['error' => $validator->errors()->first('status')], self::BAD_REQUEST);
     }
 
     /**
@@ -133,7 +139,25 @@ class ApiController extends Controller
         }
 
         Log::error(sprintf("Client:[%s] failed to %s:%s, [%s].", __CLASS__, __FUNCTION__, $request->getClientIp(), $validator->errors()->first()));
-        return $this->sendResponse(['error' => $validator->errors()->first()], 503);
+        return $this->sendResponse(['error' => $validator->errors()->first()], self::BAD_REQUEST);
+    }
+
+    /**
+     * @param string $message
+     * @return \Illuminate\Http\Response
+     */
+    public function error400($message = 'The server could not understand the request due to invalid syntax.')
+    {
+        return $this->sendResponse(['error' => $message], self::BAD_REQUEST);
+    }
+
+    /**
+     * @param string $message
+     * @return \Illuminate\Http\Response
+     */
+    public function error404($message = 'Prediction not found.')
+    {
+        return $this->sendResponse(['error' => $message], self::NOT_FOUND);
     }
 
     /**
